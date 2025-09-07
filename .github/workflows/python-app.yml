@@ -21,7 +21,6 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: "3.10"
-        cache: pip
 
     - name: Install Dependencies
       run: |
@@ -31,12 +30,7 @@ jobs:
     - name: Linting with flake8
       run: |
         pip install flake8
-        # find only changed *.py files compared to main
-        CHANGED_FILES=$(git diff --name-only origin/main...HEAD -- '*.py')
-        if [ -n "$CHANGED_FILES" ]; then
-          echo "Running flake8 on changed files:"
-          echo "$CHANGED_FILES"
-          flake8 $CHANGED_FILES
-        else
-          echo "No Python files changed."
-        fi
+        # stop the build if there are Python syntax errors or undefined names
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
